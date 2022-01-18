@@ -6,6 +6,7 @@ use bitcoincore_rpc::bitcoin::blockdata::script::Instruction;
 use bitcoincore_rpc::bitcoin::{Address, SigHashType, TxOut, Txid};
 use bitcoincore_rpc::RpcApi;
 use bitcoincore_rpc::{Auth, Client};
+use dirs::home_dir;
 use log::{error, info, LevelFilter};
 use simple_logging::{log_to_file, log_to_stderr};
 use structopt::StructOpt;
@@ -13,12 +14,12 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "sighashargs", about = "Bitcoin SigHash Scanner Arguments")]
 struct ProgramArguments {
-    user: String,
-    pass: String,
-    #[structopt(default_value = "127.0.0.1:8332")]
+    #[structopt(default_value = "127.0.0.1:8332", long = "address")]
     address: SocketAddr,
-    #[structopt(parse(from_os_str))]
+    #[structopt(parse(from_os_str), long = "log-file")]
     log_file: Option<PathBuf>,
+    #[structopt(parse(from_os_str), long = "bitcoin-dir")]
+    bitcoin_dir: Option<PathBuf>,
 }
 
 fn main() {
@@ -26,8 +27,6 @@ fn main() {
     let mut url = "http://".to_string();
     url.push_str(args.address.to_string().as_str());
 
-    let user = args.user;
-    let pass = args.pass;
     match args.log_file {
         None => log_to_stderr(LevelFilter::Info),
         Some(f) => log_to_file(
@@ -39,7 +38,24 @@ fn main() {
     }
 
     const MAX_BLOCK_HEIGHT: u64 = 710000;
-    let auth = Auth::UserPass(user, pass);
+    let mut cookie_path = match args.bitcoin_dir {
+        Some(p) => p,
+        None => match true {
+            cfg!(target_os = "window") => {
+                let mut p = dirs::config_dir().expect("Failed to get default bitcoin directory, please specify it using --bitcoin-dir");
+                p.push("Bitcoin");
+                p
+            }
+            _ => {
+                let mut p = dirs::home_dir().expect("Failed to get default bitcoin directory, please specify it using --bitcoin-dir");
+                p.push(".bitcoin");
+                p
+            }
+        },
+    };
+    println!("{:?}", cookie_path);
+    cookie_path.push(".cookie");
+    let auth = Auth::CookieFile(cookie_path);
     let client = Client::new(url.as_str(), auth).unwrap();
     let mut utxos = HashMap::<(Txid, usize), TxOut>::new();
     (0..MAX_BLOCK_HEIGHT).into_iter().for_each(|height| {
