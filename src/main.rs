@@ -6,7 +6,6 @@ use bitcoincore_rpc::bitcoin::blockdata::script::Instruction;
 use bitcoincore_rpc::bitcoin::{Address, SigHashType, TxOut, Txid};
 use bitcoincore_rpc::RpcApi;
 use bitcoincore_rpc::{Auth, Client};
-use dirs::home_dir;
 use log::{error, info, LevelFilter};
 use simple_logging::{log_to_file, log_to_stderr};
 use structopt::StructOpt;
@@ -73,7 +72,7 @@ fn main() {
         };
 
         let current_block = client.get_block(&current_block_hash).unwrap();
-        current_block.txdata.clone().iter().for_each(|tx| {
+        current_block.txdata.iter().for_each(|tx| {
             for (vout, txout) in tx.output.iter().enumerate() {
                 utxos.insert((tx.txid(), vout), txout.clone());
             }
