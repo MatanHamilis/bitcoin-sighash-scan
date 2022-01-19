@@ -1,6 +1,6 @@
 # Bitcoin Scan Sighash
 
-This tool is an educational method to learn more about Bitcoin's `SIGHASH_SINGLE` bug.
+This tool is an educational source to learn more about Bitcoin's `SIGHASH_SINGLE` bug.
 You can read the whole post [here](https://github.com/MatanHamilis/sighash_post)
 
 ## Requirements
@@ -8,6 +8,7 @@ You can read the whole post [here](https://github.com/MatanHamilis/sighash_post)
 To use this tool, you'll first have to run your own node of Bitcoin.
 If you already have one, move to the next step.
 Otherwise,  follow the instruction from  [Bitcoin core's website](https://bitcoincore.org/).
+Notice it might take a while to synchronize your node.
 In the end of the process your Bitcoin node should be up and running.
 You'll also have to obtain the username and password for your RPC.
 

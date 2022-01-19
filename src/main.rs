@@ -36,7 +36,6 @@ fn main() {
         .expect("Failed to set up logging!"),
     }
 
-    const MAX_BLOCK_HEIGHT: u64 = 710000;
     let mut cookie_path = match args.bitcoin_dir {
         Some(p) => p,
         None => match true {
@@ -57,7 +56,13 @@ fn main() {
     let auth = Auth::CookieFile(cookie_path);
     let client = Client::new(url.as_str(), auth).unwrap();
     let mut utxos = HashMap::<(Txid, usize), TxOut>::new();
-    (0..MAX_BLOCK_HEIGHT).into_iter().for_each(|height| {
+    let block = u64::from(
+        client
+            .get_mining_info()
+            .expect("Failed to fetch the height of latest block")
+            .blocks,
+    );
+    (0..block).into_iter().for_each(|height| {
         if height % 500 == 0 {
             info!("height: {}", height);
         }
