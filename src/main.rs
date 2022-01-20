@@ -51,7 +51,6 @@ fn main() {
             }
         },
     };
-    println!("{:?}", cookie_path);
     cookie_path.push(".cookie");
     let auth = Auth::CookieFile(cookie_path);
     let client = Client::new(url.as_str(), auth).unwrap();
