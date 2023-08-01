@@ -39,7 +39,7 @@ fn main() {
     let mut cookie_path = match args.bitcoin_dir {
         Some(p) => p,
         None => match true {
-            cfg!(target_os = "window") => {
+            cfg!(target_os = "windows") => {
                 let mut p = dirs::config_dir().expect("Failed to get default bitcoin directory, please specify it using --bitcoin-dir");
                 p.push("Bitcoin");
                 p
